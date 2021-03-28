@@ -2,6 +2,8 @@ import requests
 import json
 import os.path
 from os import path
+import numpy as np
+import sys
 
 
 def verify_rosters(current_year):
@@ -12,6 +14,7 @@ def verify_rosters(current_year):
     #I'm not super concerned if players transfer
     #They're GENERALLY not as good as their index says
     final_rosters = {}
+    positions = {}
     for person in verified_roster:
         try:
             player_name = person['first_name'] + ' ' + person['last_name']
@@ -19,7 +22,10 @@ def verify_rosters(current_year):
             #print(person, " is a buggy datapoint")
             continue
         person_team = person['team']
-        position = person['position']
+        position = pos_narrow(person['position'])
+        if position == '?' or position == None or position == 'ATH':
+            continue
+        positions[position] = 1
         try:
             if detect_player(prelim_roster[person_team][position],player_name):
                 if person_team in final_rosters:
@@ -31,7 +37,12 @@ def verify_rosters(current_year):
                     final_rosters[person_team] = {position: [person]}
             else:
                 pos = sweep_roster(prelim_roster[person_team],player_name)
+                if position == 'DB':
+                    print('DB')
+                if position == 'CB':
+                    print('CB')
                 if pos is not None:
+                    pos = position #this will change where players are stored
                     if person_team in final_rosters:
                         if pos in final_rosters[person_team]:
                             final_rosters[person_team][pos].append(person)
@@ -42,16 +53,28 @@ def verify_rosters(current_year):
 
 
         except KeyError:
-            continue
-            #print(person_team," has some recruiting problems at ",position)
+            pos = sweep_roster(prelim_roster[person_team],player_name)
+            if pos is not None:
+                pos = position #this will change where players are stored
+                if person_team in final_rosters:
+                    if pos in final_rosters[person_team]:
+                        final_rosters[person_team][pos].append(person)
+                    else:
+                        final_rosters[person_team][pos] = [person]
+                else:
+                    final_rosters[person_team] = {pos: [person]}
 
-    print(final_rosters['Michigan']['RB'])
-    print(final_rosters['Michigan']['APB'])
-    for player in prelim_roster['Michigan']['RB']:
-        print(player['name'])
+    print(final_rosters['Michigan']['DB'])
+    #print(final_rosters['Michigan']['APB'])
+    #for player in prelim_roster['Michigan']['RB']:
+        #print(player['name'])
     #RIGHT NOW, the athletes/apb/etc are grouped together but maintain their current position
     #print(prelim_roster['Michigan']['RB'])
     #print(verified_roster['Michigan']['RB'])
+    with open('finalized_rosters{}.json'.format(current_year), 'w') as fp:
+        json.dump(final_rosters, fp)
+    """for key,value in positions.items():
+        print(key)"""
 
     
 def detect_player(list_dict,player_name):
@@ -67,6 +90,24 @@ def sweep_roster(team,player_name):
         if detect_player(pos,player_name):
             return key
     return None
+
+def pos_narrow(position):
+    if position == 'OT' or position == 'LS' or position == 'G' or position == 'C':
+        return 'OL'
+    if position == 'FB':
+        return 'TE'
+    if position == 'DE' or position == 'NT' or position == 'DT':
+        return 'DL'
+    if position == 'CB' or position == 'S':
+        return 'DB'
+    return position
+
+
+"""def narrow_roster(current_year)
+    with open('finalized_rosters{}.json'.format(current_year)) as f:
+        verified_roster = json.load(f)"""
+    
+
 
 if __name__ == "__main__":
     verify_rosters(2020)
