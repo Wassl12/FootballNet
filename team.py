@@ -1,10 +1,10 @@
 import json
+import torch.nn
 
 
 class Team():
 
-
-    def __init__(self,name,year):
+    def __init__(self, name, year):
         our__dict = {}
         with open('data/finalized_rosters{}.json'.format(year)) as f:
             our_dict = json.load(f)
@@ -24,15 +24,13 @@ class Team():
             for play in self.roster[pos]:
                 if 'rating' not in play:
                     play['rating'] = 0.7
-            players.sort(reverse=True,key=lambda player: player['rating']+player['year']/7)
+            players.sort(reverse=True, key=lambda player: player['rating']+player['year']/7)
         self.clean_info({})
 
-    
-
-    def clean_info(self,params):
+    def clean_info(self, params):
         rating = False
         current_year = False
-        with open('data/ffnn.json') as f:
+        with open("data/ffnn.json") as f:
             info = json.load(f)
         if rating in params:
             rating = True
@@ -42,9 +40,9 @@ class Team():
             print(key)
             for i in range(value):
                 try:
-                    print(self.roster[key][i]['first_name'],end=' ')
-                    print(self.roster[key][i]['last_name'],end=' ')
-                    print(self.roster[key][i]['rating'],end='\n')
+                    print(self.roster[key][i]['first_name'], end=' ')
+                    print(self.roster[key][i]['last_name'], end=' ')
+                    print(self.roster[key][i]['rating'], end='\n')
                 except IndexError:
                     print(' small team.')
 
@@ -54,13 +52,16 @@ class Team():
                 for n in range(i+1,len(self.roster[pos])):
                     if self.roster[pos][i]['id'] == self.roster[pos][n]['id']:
                         self.roster[pos].pop(n)
-                        self.remove_dupes() #extremely lazy
+                        self.remove_dupes()  # extremely lazy
                         return
 
 
 if __name__ == "__main__":
-    michigan = Team('Michigan',2020)
-    #michigan.clean_info({'rating': True, 'current_year': 2020})
+    print(torch.__version__)
+    print(torch.cuda.is_available())
+    print(torch.cuda.get_device_name(device=None))
+    michigan = Team('Michigan', 2020)
+    # michigan.clean_info({'rating': True, 'current_year': 2020})
 
 
         
