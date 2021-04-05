@@ -4,9 +4,6 @@ import os.path
 from os import path
 import numpy as np
 import sys
-import team.py
-import importlib
-
 
 def verify_rosters(current_year):
     with open('verified_rosters{}.json'.format(current_year)) as f:
@@ -54,7 +51,7 @@ def verify_rosters(current_year):
                             final_rosters[person_team][pos] = [person]
                     else:
                         final_rosters[person_team] = {pos: [person]}
-                    final_rosters[person_team][pos][-1]['rating'] = detect_player(prelim_roster[person_team][position],player_name)
+                    final_rosters[person_team][pos][-1]['rating'] = rating
 
 
         except KeyError:
@@ -117,5 +114,4 @@ def pos_narrow(position):
 
 
 if __name__ == "__main__":
-    #verify_rosters(2020)
-    
+    verify_rosters(2020)
