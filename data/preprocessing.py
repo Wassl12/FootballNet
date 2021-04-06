@@ -114,4 +114,5 @@ def pos_narrow(position):
 
 
 if __name__ == "__main__":
-    verify_rosters(2020)
+    for year in [2016,2017,2018,2019]:
+        verify_rosters(year)

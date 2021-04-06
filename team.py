@@ -127,31 +127,31 @@ if __name__ == "__main__":
     print(torch.__version__)
     print(torch.cuda.is_available())
     print(torch.cuda.get_device_name(device=None))
-    # michigan = Team('Michigan', 2020,gpu=cuda)
-    """validation_split = {}
-    train_dict = {}
-    validation_dict = {}
-    with open('data/hand_picked.json') as val:
-        validation_split = json.load(val)
-    timeless_dict = {}
-    teams = {}
-    with open('data/team_list.json') as teams:
-        teams = json.load(teams)
-    for team, names in teams.items():
-        current_team = Team(team, 2020, gpu=cuda)
-        timeless_dict[team] = current_team.layers
-    for team in timeless_dict:
-        if team in validation_split:
-            validation_dict[team] = timeless_dict[team]
-        else:
-            train_dict[team] = timeless_dict[team]
-    torch.save(validation_dict, 'tensors/validation{}'.format(2020))
-    torch.save(train_dict, 'tensors/train{}'.format(2020))"""
-    validation_dict = torch.load('tensors/validation{}'.format(2020))
-    train_dict = torch.load('tensors/train{}'.format(2020))
-    '''for team, tense in validation_dict.items():
-        print(team)
-        print(tense[0][0][0])'''
+    for year in [2016,2017,2018,2019,2020]:
+        """validation_split = {}
+        train_dict = {}
+        validation_dict = {}
+        with open('data/hand_picked.json') as val:
+            validation_split = json.load(val)
+        timeless_dict = {}
+        teams = {}
+        with open('data/team_list.json') as teams:
+            teams = json.load(teams)
+        for team, names in teams.items():
+            current_team = Team(team, year, gpu=cuda)
+            timeless_dict[team] = current_team.layers
+        for team in timeless_dict:
+            if team in validation_split:
+                validation_dict[team] = timeless_dict[team]
+            else:
+                train_dict[team] = timeless_dict[team]
+        torch.save(validation_dict, 'tensors/validation{}'.format(year))
+        torch.save(train_dict, 'tensors/train{}'.format(year))"""
+        validation_dict = torch.load('tensors/validation{}'.format(year))
+        train_dict = torch.load('tensors/train{}'.format(year))
+        for team, tense in validation_dict.items():
+            print(team)
+            print(tense[0][0][0])
     #  model = RNN(0)
 
 
