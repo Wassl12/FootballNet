@@ -57,13 +57,13 @@ class Team():
         self.remove_dupes()
         for pos, players in self.roster.items():
             for play in self.roster[pos]:
-                if 'rating' not in play:
+                if 'rating' not in play or play['rating'] is None:
                     play['rating'] = 0.7
-                if 'weight' not in play:
+                if 'weight' not in play or play['weight'] is None:
                     play['weight'] = 160
-                if 'height' not in play:
+                if 'height' not in play or play['height'] is None:
                     play['height'] = 70
-                if 'year' not in play:
+                if 'year' not in play or play['year'] is None:
                     play['year'] = 1
             players.sort(reverse=True, key=lambda player: player['rating'])
         self.create_layers()
@@ -103,22 +103,25 @@ class Team():
         with open("data/ffnn.json") as f:
             info = json.load(f)
         for position, occurrences in info.items():
-            print(position, occurrences)
+            #print(position, occurrences)
             for i in range(occurrences*3):
                 try:
-                    print(self.roster[position][i]['first_name'], end=' ')
-                    print(self.roster[position][i]['last_name'], end=' ')
-                    print(self.roster[position][i]['rating'], end='\n')
+                    #print(self.roster[position][i]['first_name'], end=' ')
+                    #print(self.roster[position][i]['last_name'], end=' ')
+                    #print(self.roster[position][i]['rating'], end='\n')
                     self.layers[global_counter+i][0][0] = self.roster[position][i]['rating']
                     self.layers[global_counter + i][0][1] = self.roster[position][i]['year']
                     self.layers[global_counter + i][1][0] = self.roster[position][i]['weight']
                     self.layers[global_counter + i][1][1] = self.roster[position][i]['height']
-                    print(self.layers[global_counter+i])
+                    #print(self.layers[global_counter+i])
                 except:
                     global_counter += occurrences * 3
                     break
             global_counter += occurrences * 3
-
+        """if self.name == 'Michigan':
+            print(self.layers)
+            print(self.roster)
+            print('STOPIT')"""
 
 
 
@@ -128,7 +131,7 @@ if __name__ == "__main__":
     print(torch.cuda.is_available())
     print(torch.cuda.get_device_name(device=None))
     for year in [2016,2017,2018,2019,2020]:
-        """validation_split = {}
+        validation_split = {}
         train_dict = {}
         validation_dict = {}
         with open('data/hand_picked.json') as val:
@@ -139,20 +142,19 @@ if __name__ == "__main__":
             teams = json.load(teams)
         for team, names in teams.items():
             current_team = Team(team, year, gpu=cuda)
+
             timeless_dict[team] = current_team.layers
         for team in timeless_dict:
             if team in validation_split:
+                if team == 'Northwestern':
+                    print(timeless_dict[team])
                 validation_dict[team] = timeless_dict[team]
             else:
                 train_dict[team] = timeless_dict[team]
         torch.save(validation_dict, 'tensors/validation{}'.format(year))
-        torch.save(train_dict, 'tensors/train{}'.format(year))"""
-        validation_dict = torch.load('tensors/validation{}'.format(year))
-        train_dict = torch.load('tensors/train{}'.format(year))
-        for team, tense in validation_dict.items():
-            print(team)
-            print(tense[0][0][0])
-    #  model = RNN(0)
+        torch.save(train_dict, 'tensors/train{}'.format(year))
+
+
 
 
         
