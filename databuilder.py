@@ -46,17 +46,12 @@ if __name__ == "__main__":
             if home_team in validation_dict or away_team in validation_dict:
                 validation_brick.append(home_brick+away_brick)
             else:
-                train_brick.append({'home_team': home_team, 'away_team': away_team, 'strength': home_brick+away_brick})
+                train_brick.append({'home_team': home_team, 'away_team': away_team, 'strength': torch.cat((home_brick,away_brick),0)})
         for dict in train_brick: # to help look at actually good teams
-            print(dict['home_team'])
-            print(dict['away_team'])
             counter = 0
             team_split = 0
             for player in dict['strength']:
-                if player[0][0] == 0 and player[0][1] == 0 and player[1][0] == 0 and player[1][1] == 0:
-                    continue
-                else:
-                    print(counter)
+                if player[0][0] != 0 or player[0][1] != 0 or player[1][0] != 0 or player[1][1] != 0:
                     counter += 1
                 team_split += 1
                 if team_split == 120: # other team
@@ -66,7 +61,8 @@ if __name__ == "__main__":
                         break
                 if team_split == 240:
                     if counter >= 30:
-                        print(dict)
+                        print(dict['home_team'])
+                        print(dict['away_team'])
         torch.save(validation_brick,'tensors/validation_data')
         torch.save(train_brick, 'tensors/train_data')
 
