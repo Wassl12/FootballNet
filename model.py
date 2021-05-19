@@ -28,7 +28,7 @@ class RNN(nn.Module):
         nn.init.constant_(self.fc.bias, 0.0)
     
     def forward(self, timeless, game_results=None,num_games=None):
-        if game_results is None:
+        if game_results is None: # predict first week
             batch, channels, width, height = timeless.shape # should be b x 240 x 2 x 2
             print("Batch size:",batch)
             print("Channels:", channels)
@@ -40,7 +40,7 @@ class RNN(nn.Module):
             output = self.fc(rosters)
 
             return output
-        else:
+        else: # predict rest of the weeks
             batch, channels, width, height = timeless.shape  # should be b x 240 x 2 x 2
             rosters = F.sigmoid(self.roster_scan_1(timeless))
             rosters = F.sigmoid(self.roster_scan_2(rosters))

@@ -8,19 +8,16 @@ GLOBAL_COUNTER = 0
 BATCH_SIZE = 16
 
 
-def train_step(model, criterion, optimizer, game_list, validation_dict,train_dict):
+def train_step(model, criterion, optimizer, trainX,trainY):
+    # Tell the model to start training
     model.train()
-    running_loss = 0.0
-    # Local batches and labels
-    inputs = []
-    labels = []
 
     # zero the parameter gradients
     optimizer.zero_grad()
 
     # forward + backward + optimize
-    outputs = model(inputs)
-    loss = criterion(outputs, labels)
+    outputs = model(trainX)
+    loss = criterion(outputs, trainY)
     loss.backward()
     optimizer.step()
 
@@ -33,19 +30,34 @@ print('Finished Training')
 
 
 if __name__ == "__main__":
-    game_list = []
-    trainGames = []
-    valGames = []
 
-    with open('tensors/train_data') as train:
-        for game in train:
-            trainGames.append(game['strength'])
-    trainX = torch.FloatTensor(trainGames)
-    with open('tensors/validation_data') as val:
-        for game in val:
-            valGames.append(game['strength'])
-    valX = torch.FloatTensor(valGames)
+    train = torch.load('tensors/train_data')
+    trainX = train[0]['strength']
+    trainX = torch.stack((trainX,train[1]['strength']))
+    i = 0
+    for game in train:
+        print(game['home_team'])
+        print(game['away_team'])
+        if i > 1:
+            newGame = torch.unsqueeze(game['strength'],0)
+            trainX = torch.cat((trainX,newGame))
+        i += 1
 
+    val = torch.load('tensors/validation_data')
+    valX = val[0]['strength']
+    valX = torch.stack((valX,val[1]['strength']))
+    i = 0
+    for game in val:
+        if i > 1:
+            newGame = torch.unsqueeze(game['strength'], 0)
+            valX = torch.cat((valX,newGame))
+        i += 1
+
+    # I don't know a fantastic way to do this
+    valY = torch.load('tensors/validation_labels')
+    trainY = torch.load('tensors/train_labels')
+    valY = torch.Tensor(valY)
+    trainY = torch.Tensor(trainY)
 
     # BATCH SIZE WILL BE THE ENTIRE DATASET
     # IT'S NOT THAT BIG
@@ -59,5 +71,6 @@ if __name__ == "__main__":
 
     print("Parameter count", sum(p.numel() for p in model.parameters() if p.requires_grad))
     for epoch in range(NUM_EPOCHS):
-        train_step(model, criterion, optimizer, game_list, validation_dict,train_dict)
+        print(trainX.shape)
+        train_step(model, criterion, optimizer, trainX, trainY)
 

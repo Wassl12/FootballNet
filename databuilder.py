@@ -11,29 +11,42 @@ def schedule_fix(schedule):
             print(line[-1])
             valid_teams[line] = True
     new_schedule = []
+    wins_losses = []
     for dict in schedule:
         team1 = dict['home_team']
         team2 = dict['away_team']
         print(team1,team2)
         if team1 in valid_teams or team2 in valid_teams:
             new_schedule.append((team1,team2))
-    print(new_schedule)
-    return new_schedule
+            print(team1,team2)
+            try:
+                if dict['home_points'] > dict['away_points']:
+                    wins_losses.append(0)
+                else:
+                    wins_losses.append(1)
+            except: # the dataset is full of None values, just say the away team won
+                wins_losses.append(1)
+    print(len(new_schedule))
+    print(len(wins_losses))
+    return new_schedule, wins_losses# list of tuples (home,away)
 
 
 
 if __name__ == "__main__":
+    train_brick = []
+    validation_brick = []
+    validation_labels = []
+    train_labels = []
     for year in [2016, 2017, 2018, 2019, 2020]:
         validation_dict = torch.load('tensors/validation{}'.format(year))
         train_dict = torch.load('tensors/train{}'.format(year))
         with open('data/schedules{}.json'.format(year),'r') as schedule:
             schedule_dict = json.load(schedule)
-        for team, tense in validation_dict.items():
+        '''for team, tense in validation_dict.items():
             print(team)
-            print(tense[0])
-        fixed_schedule = schedule_fix(schedule_dict)
-        train_brick = []
-        validation_brick = []
+            print(tense[0])'''
+        fixed_schedule,wins_losses = schedule_fix(schedule_dict)
+        game_num = 0
         for home_team, away_team in fixed_schedule:
             if home_team in validation_dict:
                 home_brick = validation_dict[home_team]
@@ -44,9 +57,13 @@ if __name__ == "__main__":
             else:
                 away_brick = train_dict[away_team]
             if home_team in validation_dict or away_team in validation_dict:
-                validation_brick.append(home_brick+away_brick)
+                validation_brick.append({'home_team': home_team, 'away_team': away_team, 'strength': torch.cat((home_brick,away_brick),0)})
+                validation_labels.append(wins_losses[game_num])
             else:
                 train_brick.append({'home_team': home_team, 'away_team': away_team, 'strength': torch.cat((home_brick,away_brick),0)})
+                train_labels.append(wins_losses[game_num])
+            game_num += 1
+        print(game_num)
         for dict in train_brick: # to help look at actually good teams
             counter = 0
             team_split = 0
@@ -63,8 +80,14 @@ if __name__ == "__main__":
                     if counter >= 30:
                         print(dict['home_team'])
                         print(dict['away_team'])
+        print(len(validation_brick))
+        print(len(train_brick))
+        print(len(validation_labels))
+        print(len(train_labels))
         torch.save(validation_brick,'tensors/validation_data')
         torch.save(train_brick, 'tensors/train_data')
+        torch.save(validation_labels,'tensors/validation_labels')
+        torch.save(train_labels, 'tensors/train_labels')
 
 
 
