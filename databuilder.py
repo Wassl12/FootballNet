@@ -80,14 +80,22 @@ if __name__ == "__main__":
                     if counter >= 30:
                         print(dict['home_team'])
                         print(dict['away_team'])
-        print(len(validation_brick))
-        print(len(train_brick))
-        print(len(validation_labels))
-        print(len(train_labels))
-        torch.save(validation_brick,'tensors/validation_data')
-        torch.save(train_brick, 'tensors/train_data')
-        torch.save(validation_labels,'tensors/validation_labels')
-        torch.save(train_labels, 'tensors/train_labels')
+    print(len(validation_brick))
+    print(len(train_brick))
+    print(len(validation_labels))
+    print(len(train_labels))
+    torch.save(validation_brick,'tensors/validation_data')
+    torch.save(train_brick, 'tensors/train_data')
+    validation_labels = torch.Tensor(validation_labels)
+    train_labels = torch.Tensor(train_labels)
+    train_labels_gpu = torch.zeros((len(train_labels)), device=torch.device('cuda'),dtype=torch.long)
+    val_labels_gpu = torch.zeros((len(validation_labels)), device=torch.device('cuda'),dtype=torch.long)
+    for i in range(len(train_labels)):
+        train_labels_gpu[i] = train_labels[i]
+    for i in range(len(validation_labels)):
+        val_labels_gpu[i] = validation_labels[i]
+    torch.save(val_labels_gpu,'tensors/validation_labels')
+    torch.save(train_labels_gpu, 'tensors/train_labels')
 
 
 

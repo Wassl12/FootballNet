@@ -3,23 +3,24 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 
-class RNN(nn.Module):
+class footballNN(nn.Module):
     """Going to pass Batch,Players,2,2"""
+    """Flattened into 960 nodes"""
 
     def __init__(self, num_weekly_features):
         super().__init__()
         self.hidden_size = 80
-        self.roster_scan_1 = nn.Conv2d(240, out_channels=240, kernel_size=1) # CNN layer
-        self.roster_scan_2 = nn.Conv2d(240, 80, kernel_size=2) # CNN Layer
-        self.lstm = nn.LSTMCell(num_weekly_features, self.hidden_size) # LSTM Cell
-        self.fc = nn.Linear(self.hidden_size, 2) # Create an output from an LSTM Cell
+        self.roster_scan_1 = nn.Linear(960, 240).double()
+        self.roster_scan_2 = nn.Linear(240, self.hidden_size).double()
+        self.lstm = nn.LSTMCell(num_weekly_features, self.hidden_size).double() # LSTM Cell
+        self.fc = nn.Linear(self.hidden_size, 2).double() # Create an output from an LSTM Cell
         self.init_weights()
 
     def init_weights(self):
 
-        for conv in [self.roster_scan_1, self.roster_scan_2]:
-            nn.init.xavier_uniform_(conv.weight, gain=1.0)
-            nn.init.constant_(conv.bias, 0.0)
+        for fc in [self.roster_scan_1, self.roster_scan_2]:
+            nn.init.xavier_uniform_(fc.weight, gain=1.0)
+            nn.init.constant_(fc.bias, 0.0)
         nn.init.xavier_uniform_(self.lstm.weight_ih, gain=1.0)
         nn.init.xavier_uniform_(self.lstm.weight_hh, gain=1.0)
         nn.init.constant_(self.lstm.bias_ih, 0.0)
@@ -29,11 +30,7 @@ class RNN(nn.Module):
     
     def forward(self, timeless, game_results=None,num_games=None):
         if game_results is None: # predict first week
-            batch, channels, width, height = timeless.shape # should be b x 240 x 2 x 2
-            print("Batch size:",batch)
-            print("Channels:", channels)
-            print("Width:",width)
-            print("Height:",height)
+            batch, channels, width, height = timeless.shape
             rosters = F.sigmoid(self.roster_scan_1(timeless))
             rosters = F.sigmoid(self.roster_scan_2(rosters))
             rosters = rosters.view(-1, self.hidden_size)
