@@ -1,11 +1,10 @@
 import json
 import torch.nn
-from model import RNN
 
 def schedule_fix(schedule):
     """Return a schedule with all FCS only games stripped."""
     valid_teams = {}
-    with open('data/fbs.txt', 'r') as fbs:
+    with open('valid.txt', 'r') as fbs:
         for line in fbs:
             line = line.strip('\n')
             print(line[-1])

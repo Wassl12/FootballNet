@@ -4,7 +4,7 @@ import torch.nn
 import torch.optim
 import json
 from torch.nn.functional import softmax
-NUM_EPOCHS = 20
+NUM_EPOCHS = 10
 GLOBAL_COUNTER = 0
 BATCH_SIZE = 16
 
@@ -33,15 +33,18 @@ def train_step(model, criterion, optimizer, trainX,trainY,valX,valY,val):
     right = 0
     total = 0
     for i in range(val_predictions.shape[0]):
-        """if val[i]['home_team'] == 'Alabama' or val[i]['away_team'] == 'Alabama' or True:
+        if val[i]['home_team'] == 'Ohio State' or val[i]['away_team'] == 'Ohio State':
             if val_predictions[i] == 0:
                 print("Predicted", val[i]['home_team'], "over", val[i]['away_team'])
+                print(pred[i])
             else:
                 print("Predicted", val[i]['away_team'], "over", val[i]['home_team'])
+                print(pred[i])
             if valY[i]==0:
                 print('ACTUAL: ', val[i]['home_team'])
             else:
-                print('ACTUAL: ', val[i]['away_team'])"""
+                print('ACTUAL: ', val[i]['away_team'])
+            print(valX[i])
         if val_predictions[i] == valY[i]:
             right += 1
         total +=1
@@ -69,8 +72,6 @@ if __name__ == "__main__":
     trainX = torch.stack((trainX,train[1]['strength']))
     i = 0
     for game in train:
-        print(game['home_team'])
-        print(game['away_team'])
         if i > 1:
             newGame = torch.unsqueeze(game['strength'],0)
             trainX = torch.cat((trainX,newGame))
@@ -95,9 +96,20 @@ if __name__ == "__main__":
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     ##########################################################################
+    ######## TIME TO CONVERT BRICKS INTO FULLY CONNECTED FORMAT ##############
+    flattened_train_x = torch.zeros((trainX.shape[0],960),device=torch.device('cuda'),dtype=torch.double)
+    for i in range(trainX.shape[0]):
+        flattened_train_x[i] = torch.flatten(trainX[i])
+    trainX = flattened_train_x
+    flattened_val_x = torch.zeros((valX.shape[0],960),device=torch.device('cuda'),dtype=torch.double)
+    for i in range(valX.shape[0]):
+        flattened_val_x[i] = torch.flatten(valX[i])
+    valX = flattened_val_x
+
 
     print("Parameter count", sum(p.numel() for p in model.parameters() if p.requires_grad))
     for epoch in range(NUM_EPOCHS):
         print(trainX.shape)
         train_step(model, criterion, optimizer, trainX, trainY,valX,valY,val)
+
 

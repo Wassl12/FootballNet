@@ -1,0 +1,5 @@
+1. Run Data.py (shoulddn't ever have to rerun)
+2. Run preprocessing.py
+3. Run teams.py
+4. Run databuilder.py
+5. Run predict.py

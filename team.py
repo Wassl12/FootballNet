@@ -1,6 +1,6 @@
 import json
 import torch.nn
-from model import RNN
+from model import footballNN
 
 class Team():
 
@@ -16,43 +16,53 @@ class Team():
         try:
             self.roster['QB'] = our_dict[name]['QB']  # should be a list of quarterbacks
         except:
-            print(name, ' has no quarterbacks')
+            #print(name, ' has no quarterbacks')
+            pass
         try:
             self.roster['RB'] = our_dict[name]['RB']
         except:
-            print(name, ' has no running backs')
+            #print(name, ' has no running backs')
+            pass
         try:
             self.roster['OL'] = our_dict[name]['OL']
         except:
-            print(name, ' has no offensive linemen')
+            #print(name, ' has no offensive linemen')
+            pass
         try:
             self.roster['WR'] = our_dict[name]['WR']
         except:
-            print(name, ' has no receivers')
+            #print(name, ' has no receivers')
+            pass
         try:
             self.roster['TE'] = our_dict[name]['TE']
         except:
-            print(name, ' has no tight ends')
+            #print(name, ' has no tight ends')
+            pass
         try:
             self.roster['DB'] = our_dict[name]['DB']
         except:
-            print(name, ' has no defensive backs')
+            #print(name, ' has no defensive backs')
+            pass
         try:
             self.roster['LB'] = our_dict[name]['LB']
         except:
-            print(name, 'has no linebackers')
+            #print(name, 'has no linebackers')
+            pass
         try:
             self.roster['DL'] = our_dict[name]['DL']
         except:
-            print(name, 'has no defensive linemen')
+            #print(name, 'has no defensive linemen')
+            pass
         try:
             self.roster['PK'] = our_dict[name]['PK']
         except:
-            print(name, ' has no placekickers')
+            #print(name, ' has no placekickers')
+            pass
         try:
             self.roster['P'] = our_dict[name]['P']
         except:
-            print(name, ' has no punters')
+            #print(name, ' has no punters')
+            pass
 
         self.remove_dupes()
         for pos, players in self.roster.items():
@@ -104,20 +114,25 @@ class Team():
             info = json.load(f)
         for position, occurrences in info.items():
             #print(position, occurrences)
-            for i in range(occurrences*3):
+            for i in range(occurrences):
                 try:
                     #print(self.roster[position][i]['first_name'], end=' ')
                     #print(self.roster[position][i]['last_name'], end=' ')
                     #print(self.roster[position][i]['rating'], end='\n')
+
                     self.layers[global_counter+i][0][0] = self.roster[position][i]['rating']
                     self.layers[global_counter + i][0][1] = self.roster[position][i]['year']
                     self.layers[global_counter + i][1][0] = self.roster[position][i]['weight']
                     self.layers[global_counter + i][1][1] = self.roster[position][i]['height']
-                    #print(self.layers[global_counter+i])
+
                 except:
-                    global_counter += occurrences * 3
+                    for n in range(i,occurrences*3): # fill in the rest of the guys with dummies
+                        self.layers[global_counter + n][0][0] = 0.7
+                        self.layers[global_counter + n][0][1] = 1
+                        self.layers[global_counter + n][1][0] = 160
+                        self.layers[global_counter + n][1][1] = 70
                     break
-            global_counter += occurrences * 3
+            global_counter += occurrences # used to be three but then had problems
         """if self.name == 'Michigan':
             print(self.layers)
             print(self.roster)
