@@ -1,3 +1,5 @@
+import copy
+
 from team import Team
 from model import footballNN
 import torch.nn
@@ -6,7 +8,8 @@ import json
 from torch.nn.functional import softmax
 NUM_EPOCHS = 100
 GLOBAL_COUNTER = 0
-BATCH_SIZE = 1
+BATCH_SIZE = 2
+SIMULATED_TEAM_SIZE = 18
 
 
 def train_step(model, criterion, optimizer, trainX,trainY,valX,valY,val):
@@ -45,18 +48,6 @@ def train_step(model, criterion, optimizer, trainX,trainY,valX,valY,val):
     trainPreds = torch.round(m(torch.squeeze(model(trainX))))
     val_outputs = m(torch.squeeze(model(valX)))
     val_outputs = torch.round(val_outputs)
-    print(val_outputs.shape[0])
-    """for i in range(val_outputs.shape[0]):
-        #if val[i]['home_team'] == 'Ohio State':
-        if val_outputs[i] == 0:
-            print("Predicted", 'home', val[i]['home_team'], "over", val[i]['away_team'])
-        else:
-            print("Predicted", 'away', val[i]['away_team'], "over", val[i]['home_team'])
-        if valY[i]==0:
-            print('ACTUAL: ', val[i]['home_team'])
-        else:
-            print('ACTUAL: ', val[i]['away_team'])
-        print(valX[i])"""
     print("Train Accuracy:",torch.sum(trainPreds == trainY)/trainY.shape[0])
     print("Validation Accuracy:",torch.sum(val_outputs == valY)/valY.shape[0])
     print("Training loss: ",loss.item())
@@ -89,26 +80,52 @@ if __name__ == "__main__":
     trainY = torch.load('tensors/train_labels')
 
     ##############  HYPERPARAMETERS AND MODEL CREATION  ######################
-    model = footballNN(0)
+    model = footballNN(0,SIMULATED_TEAM_SIZE)
     model.to(torch.device('cuda'))
     criterion = torch.nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=.001)
     ##########################################################################
     ######## TIME TO CONVERT BRICKS INTO FULLY CONNECTED FORMAT ##############
-    flattened_train_x = torch.zeros((trainX.shape[0],20),device=torch.device('cuda'),dtype=torch.double)
+    flattened_train_x = torch.zeros((trainX.shape[0],2*SIMULATED_TEAM_SIZE),device=torch.device('cuda'),dtype=torch.double)
     for i in range(trainX.shape[0]):
         flattened_train_x[i] = torch.flatten(trainX[i])
     trainX = flattened_train_x
-    flattened_val_x = torch.zeros((valX.shape[0],20),device=torch.device('cuda'),dtype=torch.double)
+    flattened_val_x = torch.zeros((valX.shape[0],2*SIMULATED_TEAM_SIZE),device=torch.device('cuda'),dtype=torch.double)
     for i in range(valX.shape[0]):
         flattened_val_x[i] = torch.flatten(valX[i])
     valX = flattened_val_x
 
 
     print("Parameter count", sum(p.numel() for p in model.parameters() if p.requires_grad))
+    sig = torch.nn.Sigmoid()
+    best_val_accuracy = 0.0
     for epoch in range(NUM_EPOCHS):
         train_step(model, criterion, optimizer, trainX, trainY,valX,valY,val)
-    # FINETUNE THE MODEL
-    #for epoch in range(NUM_EPOCHS):
-     #   train_step(model, criterion, optimizer, trainX, trainY,valX,valY,val)
+        val_outputs = sig(torch.squeeze(model(valX)))
+        val_outputs = torch.round(val_outputs)
+        val_accuracy = torch.sum(val_outputs == valY)/valY.shape[0]
+        if val_accuracy > best_val_accuracy:
+            best_val_accuracy = val_accuracy
+            print("Copying model...")
+            best_model = copy.deepcopy(model)
+
+    torch.save(best_model,'models/model_{}_{}.pt'.format(sum(p.numel() for p in model.parameters() if p.requires_grad),best_val_accuracy))
+    val_outputs = sig(torch.squeeze(best_model(valX)))
+    print(val_outputs)
+    val_outputs = torch.round(val_outputs)
+    """for i in range(val_outputs.shape[0]):
+        if val[i]['home_team'] == 'Ohio State':
+            if val_outputs[i] == 0:
+                print("Predicted", 'home', val[i]['home_team'], "over", val[i]['away_team'])
+            else:
+                print("Predicted", 'away', val[i]['away_team'], "over", val[i]['home_team'])
+            if valY[i] == 0:
+                print('ACTUAL: ', val[i]['home_team'])
+            else:
+                print('ACTUAL: ', val[i]['away_team'])
+            #print(valX[i])
+            print('Quarterback for', val[i]['home_team'], ':',valX[i][0])
+            print('Sum for', val[i]['home_team'], ':',sum(valX[i][0:9]))
+            print('Quarterback for', val[i]['away_team'], ':', valX[i][10])
+            print('Sum for', val[i]['away_team'], ':', sum(valX[i][10:19]))"""
 

@@ -2,20 +2,24 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1b973870-8e55-4efd-abeb-273c944b7292" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/data/hand_picked.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/footballNN.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/footballNN.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/ffnn.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/ffnn.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/preprocessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/preprocessing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/databuilder.py" beforeDir="false" afterPath="$PROJECT_DIR$/databuilder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/predict.py" beforeDir="false" afterPath="$PROJECT_DIR$/predict.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runsteps.txt" beforeDir="false" afterPath="$PROJECT_DIR$/runsteps.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/team.py" beforeDir="false" afterPath="$PROJECT_DIR$/team.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensors/train2016" beforeDir="false" afterPath="$PROJECT_DIR$/tensors/train2016" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensors/train2017" beforeDir="false" afterPath="$PROJECT_DIR$/tensors/train2017" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensors/train2018" beforeDir="false" afterPath="$PROJECT_DIR$/tensors/train2018" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensors/train2019" beforeDir="false" afterPath="$PROJECT_DIR$/tensors/train2019" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensors/train2020" beforeDir="false" afterPath="$PROJECT_DIR$/tensors/train2020" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensors/train_data" beforeDir="false" afterPath="$PROJECT_DIR$/tensors/train_data" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensors/train_labels" beforeDir="false" afterPath="$PROJECT_DIR$/tensors/train_labels" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensors/validation2016" beforeDir="false" afterPath="$PROJECT_DIR$/tensors/validation2016" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensors/validation2017" beforeDir="false" afterPath="$PROJECT_DIR$/tensors/validation2017" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensors/validation2018" beforeDir="false" afterPath="$PROJECT_DIR$/tensors/validation2018" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensors/validation2019" beforeDir="false" afterPath="$PROJECT_DIR$/tensors/validation2019" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensors/validation2020" beforeDir="false" afterPath="$PROJECT_DIR$/tensors/validation2020" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensors/validation_data" beforeDir="false" afterPath="$PROJECT_DIR$/tensors/validation_data" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

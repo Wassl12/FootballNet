@@ -1,7 +1,7 @@
 import json
 import torch.nn
 from model import footballNN
-
+SIMULATED_TEAM_SIZE = 18
 class Team():
 
     def __init__(self, name, year,gpu):
@@ -108,7 +108,7 @@ class Team():
 
     def create_layers(self):
         # Make the layers tensor a 120(20?)x2x2 image
-        self.layers = torch.zeros(10, dtype=float,device=self.gpu)
+        self.layers = torch.zeros(SIMULATED_TEAM_SIZE, dtype=float,device=self.gpu)
         global_counter = 0
         with open("data/ffnn.json") as f:
             info = json.load(f)
