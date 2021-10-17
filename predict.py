@@ -6,10 +6,10 @@ import torch.nn
 import torch.optim
 import json
 from torch.nn.functional import softmax
-NUM_EPOCHS = 100
+NUM_EPOCHS = 1000
 GLOBAL_COUNTER = 0
-BATCH_SIZE = 2
-SIMULATED_TEAM_SIZE = 18
+BATCH_SIZE = 32
+SIMULATED_TEAM_SIZE = 19 # Current 18 + elo
 
 
 def train_step(model, criterion, optimizer, trainX,trainY,valX,valY,val):
@@ -52,64 +52,59 @@ def train_step(model, criterion, optimizer, trainX,trainY,valX,valY,val):
     print("Validation Accuracy:",torch.sum(val_outputs == valY)/valY.shape[0])
     print("Training loss: ",loss.item())
 
-
-
-
-if __name__ == "__main__":
+def main(model,criterion,optimizer):
     train = torch.load('tensors/train_data')
     trainX = train[0]['strength']
-    trainX = torch.stack((trainX,train[1]['strength']))
+    trainX = torch.stack((trainX, train[1]['strength']))
     i = 0
     for game in train:
         if i > 1:
-            newGame = torch.unsqueeze(game['strength'],0)
-            trainX = torch.cat((trainX,newGame))
+            newGame = torch.unsqueeze(game['strength'], 0)
+            trainX = torch.cat((trainX, newGame))
         i += 1
 
     val = torch.load('tensors/validation_data')
     valX = val[0]['strength']
-    valX = torch.stack((valX,val[1]['strength']))
+    valX = torch.stack((valX, val[1]['strength']))
     i = 0
     for game in val:
         if i > 1:
             newGame = torch.unsqueeze(game['strength'], 0)
-            valX = torch.cat((valX,newGame))
+            valX = torch.cat((valX, newGame))
         i += 1
 
     valY = torch.load('tensors/validation_labels')
     trainY = torch.load('tensors/train_labels')
 
-    ##############  HYPERPARAMETERS AND MODEL CREATION  ######################
-    model = footballNN(0,SIMULATED_TEAM_SIZE)
+
     model.to(torch.device('cuda'))
-    criterion = torch.nn.BCEWithLogitsLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=.001)
-    ##########################################################################
-    ######## TIME TO CONVERT BRICKS INTO FULLY CONNECTED FORMAT ##############
-    flattened_train_x = torch.zeros((trainX.shape[0],2*SIMULATED_TEAM_SIZE),device=torch.device('cuda'),dtype=torch.double)
+
+    flattened_train_x = torch.zeros((trainX.shape[0], 2 * SIMULATED_TEAM_SIZE), device=torch.device('cuda'),
+                                    dtype=torch.double)
     for i in range(trainX.shape[0]):
         flattened_train_x[i] = torch.flatten(trainX[i])
     trainX = flattened_train_x
-    flattened_val_x = torch.zeros((valX.shape[0],2*SIMULATED_TEAM_SIZE),device=torch.device('cuda'),dtype=torch.double)
+    flattened_val_x = torch.zeros((valX.shape[0], 2 * SIMULATED_TEAM_SIZE), device=torch.device('cuda'),
+                                  dtype=torch.double)
     for i in range(valX.shape[0]):
         flattened_val_x[i] = torch.flatten(valX[i])
     valX = flattened_val_x
-
 
     print("Parameter count", sum(p.numel() for p in model.parameters() if p.requires_grad))
     sig = torch.nn.Sigmoid()
     best_val_accuracy = 0.0
     for epoch in range(NUM_EPOCHS):
-        train_step(model, criterion, optimizer, trainX, trainY,valX,valY,val)
+        train_step(model, criterion, optimizer, trainX, trainY, valX, valY, val)
         val_outputs = sig(torch.squeeze(model(valX)))
         val_outputs = torch.round(val_outputs)
-        val_accuracy = torch.sum(val_outputs == valY)/valY.shape[0]
+        val_accuracy = torch.sum(val_outputs == valY) / valY.shape[0]
         if val_accuracy > best_val_accuracy:
             best_val_accuracy = val_accuracy
             print("Copying model...")
             best_model = copy.deepcopy(model)
 
-    torch.save(best_model,'models/model_{}_{}.pt'.format(sum(p.numel() for p in model.parameters() if p.requires_grad),best_val_accuracy))
+    torch.save(best_model, 'models/model_{}_{}.pt'.format(sum(p.numel() for p in model.parameters() if p.requires_grad),
+                                                          best_val_accuracy))
     val_outputs = sig(torch.squeeze(best_model(valX)))
     print(val_outputs)
     val_outputs = torch.round(val_outputs)
@@ -128,4 +123,14 @@ if __name__ == "__main__":
             print('Sum for', val[i]['home_team'], ':',sum(valX[i][0:9]))
             print('Quarterback for', val[i]['away_team'], ':', valX[i][10])
             print('Sum for', val[i]['away_team'], ':', sum(valX[i][10:19]))"""
+    return  best_model
+
+
+if __name__ == "__main__":
+    criterion = torch.nn.BCEWithLogitsLoss()
+    #model = footballNN(0, SIMULATED_TEAM_SIZE)
+    model = torch.load("models/model_48365_0.7249283790588379.pt")
+    optimizer = torch.optim.SGD(model.parameters(), lr=.0001,momentum=0.9)
+    main(model,criterion,optimizer)
+
 

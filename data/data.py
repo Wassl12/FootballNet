@@ -2,7 +2,7 @@ import requests
 import json
 import os.path
 from os import path
-
+cfbd_key = 'VMVOIIRs/yD2q9bmV10VxH8t5ncCPbSwhnelhV+7yos5WNu8OnK5EjC2lFqCwRbc'
 def team_fetch():
     if not path.exists('team_list.json'):
         team_list = (requests.get('https://api.collegefootballdata.com/teams')).json()
@@ -65,9 +65,17 @@ def fetch_schedules(current_year):
                 json.dump(schedules, fp)
     print( 'schedules fetched')
 
-
+def elo_fetch(years):
+    """Years is an array of years you want to search for."""
+    for year in years:
+        url = "https://api.collegefootballdata.com/ratings/elo?year={}".format(year)
+        response = requests.get(url, headers={'Authorization': f'Bearer {cfbd_key}'})
+        elos = response.json()
+        with open("elos{}.json".format(year),'w') as f:
+            json.dump(elos,f)
 if __name__ == "__main__":
-    team_fetch()
-    player_creation(2021)
+    #team_fetch()
+    #player_creation(2021)
+    elo_fetch([2015,2016,2017,2018,2019,2020])
     #fetch_actual_rosters(2020)
     #fetch_schedules(2020)

@@ -33,10 +33,10 @@ class footballNN(nn.Module):
     
     def forward(self, timeless, game_results=None,num_games=None):
         if game_results is None: # predict first week
-            rosters = F.relu(self.roster_scan_1(timeless))
-            rosters = F.relu(self.roster_scan_2(rosters))
-            rosters = F.relu(self.shrink(rosters))
-            rosters = F.relu(self.shrink2(rosters))
+            rosters = F.sigmoid(self.roster_scan_1(timeless))
+            rosters = F.sigmoid(self.roster_scan_2(rosters))
+            rosters = F.sigmoid(self.shrink(rosters))
+            rosters = F.sigmoid(self.shrink2(rosters))
             rosters = F.sigmoid(self.shrink3(rosters))
             #rosters = rosters.view(-1, self.hidden_size)
             output = self.fc(rosters)

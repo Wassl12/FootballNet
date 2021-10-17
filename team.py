@@ -8,6 +8,13 @@ class Team():
         our__dict = {}
         with open('data/finalized_rosters{}.json'.format(year)) as f:
             our_dict = json.load(f)
+        with open('data/elos{}.json'.format(year-1)) as el:
+            elos = json.load(el)[0]
+        try:
+            self.prev_elo = elos[name]
+            print(name, self.prev_elo)
+        except:
+            self.prev_elo = 1200
         self.year = year
         self.name = name
         self.gpu = gpu
@@ -108,7 +115,7 @@ class Team():
 
     def create_layers(self):
         # Make the layers tensor a 120(20?)x2x2 image
-        self.layers = torch.zeros(SIMULATED_TEAM_SIZE, dtype=float,device=self.gpu)
+        self.layers = torch.zeros(SIMULATED_TEAM_SIZE+1, dtype=float,device=self.gpu)
         global_counter = 0
         with open("data/ffnn.json") as f:
             info = json.load(f)
@@ -134,6 +141,7 @@ class Team():
                         self.layers[global_counter + n][1][1] = 70"""
                     self.layers[global_counter + i] = 0.7
                     break
+            self.layers[-1] = self.prev_elo / 1000
             global_counter += occurrences # used to be three but then had problems
         """if self.name == 'Michigan':
             print(self.layers)
