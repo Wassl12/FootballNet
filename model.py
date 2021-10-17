@@ -10,16 +10,22 @@ class footballNN(nn.Module):
     def __init__(self, num_weekly_features):
         super().__init__()
         self.hidden_size = 80
-        self.roster_scan_1 = nn.Linear(960, 960).double()
-        self.roster_scan_2 = nn.Linear(960, self.hidden_size).double()
+        self.roster_scan_1 = nn.Linear(20, 20).double()
+        self.roster_scan_2 = nn.Linear(640, 320).double() # Don't use these right now
+        self.roster_scan_3 = nn.Linear(320,40).double()
         self.lstm = nn.LSTMCell(num_weekly_features, self.hidden_size).double() # LSTM Cell
-        self.fc = nn.Linear(self.hidden_size, 2).double() # Create an output from an LSTM Cell
+        self.shrink = nn.Linear(40,40).double()
+        self.shrink2 = nn.Linear(40, 20).double()
+        self.shrink3 = nn.Linear(20, 10).double()
+        self.shrink4 = nn.Linear(10, 4).double()
+        self.fc = nn.Linear(4, 1).double()
         self.init_weights()
 
     def init_weights(self):
 
-        for fc in [self.roster_scan_1, self.roster_scan_2]:
-            nn.init.xavier_uniform_(fc.weight, gain=1.0)
+        for fc in [self.roster_scan_1, self.roster_scan_2,self.roster_scan_3,
+                   self.shrink,self.shrink2,self.shrink3,self.shrink4]:
+            nn.init.xavier_normal_(fc.weight, gain=1.0)
             nn.init.constant_(fc.bias, 0.0)
         nn.init.xavier_uniform_(self.lstm.weight_ih, gain=1.0)
         nn.init.xavier_uniform_(self.lstm.weight_hh, gain=1.0)
@@ -30,9 +36,14 @@ class footballNN(nn.Module):
     
     def forward(self, timeless, game_results=None,num_games=None):
         if game_results is None: # predict first week
-            rosters = F.sigmoid(self.roster_scan_1(timeless))
-            rosters = F.sigmoid(self.roster_scan_2(rosters))
-            rosters = rosters.view(-1, self.hidden_size)
+            rosters = F.relu(self.roster_scan_1(timeless))
+            """rosters = F.relu(self.roster_scan_2(rosters))
+            rosters = F.relu(self.roster_scan_3(rosters))
+            rosters = F.relu(self.shrink(rosters))
+            rosters = F.relu(self.shrink2(rosters))"""
+            rosters = F.relu(self.shrink3(rosters))
+            rosters = F.sigmoid(self.shrink4(rosters))
+            #rosters = rosters.view(-1, self.hidden_size)
             output = self.fc(rosters)
 
             return output

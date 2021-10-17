@@ -1,5 +1,8 @@
-1. Run Data.py (shoulddn't ever have to rerun)
-2. Run preprocessing.py
-3. Run teams.py
+1. Run Data.py (shouldn't ever have to rerun)
+2. Run preprocessing.py (from data/)
+2a. A prelim roster is a roster made of recruits we speculate are still on the team
+2b. A verified roster is the correct roster
+2c. Finalized roster is the intersection of 2a and 2b
+3. Run team.py
 4. Run databuilder.py
 5. Run predict.py

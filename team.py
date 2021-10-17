@@ -107,8 +107,8 @@ class Team():
                         return
 
     def create_layers(self):
-        # Make the layers tensor a 120x2x2 image
-        self.layers = torch.zeros(120, 2, 2, dtype=float,device=self.gpu)
+        # Make the layers tensor a 120(20?)x2x2 image
+        self.layers = torch.zeros(10, dtype=float,device=self.gpu)
         global_counter = 0
         with open("data/ffnn.json") as f:
             info = json.load(f)
@@ -119,31 +119,31 @@ class Team():
                     #print(self.roster[position][i]['first_name'], end=' ')
                     #print(self.roster[position][i]['last_name'], end=' ')
                     #print(self.roster[position][i]['rating'], end='\n')
-
-                    self.layers[global_counter+i][0][0] = self.roster[position][i]['rating']
-                    self.layers[global_counter + i][0][1] = self.roster[position][i]['year']
-                    self.layers[global_counter + i][1][0] = self.roster[position][i]['weight']
-                    self.layers[global_counter + i][1][1] = self.roster[position][i]['height']
+                    self.layers[global_counter+i] = self.roster[position][i]['rating']
+                    print(self.roster[position][i]['rating'])
+                    #self.layers[global_counter+i][0][0] = self.roster[position][i]['rating']
+                    #self.layers[global_counter + i][0][1] = self.roster[position][i]['year']
+                    #self.layers[global_counter + i][1][0] = self.roster[position][i]['weight']
+                    #self.layers[global_counter + i][1][1] = self.roster[position][i]['height']
 
                 except:
-                    for n in range(i,occurrences*3): # fill in the rest of the guys with dummies
+                    """for n in range(i,occurrences*3): # fill in the rest of the guys with dummies
                         self.layers[global_counter + n][0][0] = 0.7
                         self.layers[global_counter + n][0][1] = 1
                         self.layers[global_counter + n][1][0] = 160
-                        self.layers[global_counter + n][1][1] = 70
+                        self.layers[global_counter + n][1][1] = 70"""
+                    self.layers[global_counter + i] = 0.7
                     break
             global_counter += occurrences # used to be three but then had problems
         """if self.name == 'Michigan':
             print(self.layers)
-            print(self.roster)
-            print('STOPIT')"""
+            print(self.roster)"""
 
 
 
 if __name__ == "__main__":
     cuda = torch.device('cuda')
     print(torch.__version__)
-    print(torch.cuda.is_available())
     print(torch.cuda.get_device_name(device=None))
     for year in [2016,2017,2018,2019,2020]:
         validation_split = {}

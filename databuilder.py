@@ -1,4 +1,6 @@
 import json
+import random
+
 import torch.nn
 
 def schedule_fix(schedule):
@@ -59,15 +61,23 @@ if __name__ == "__main__":
                 validation_brick.append({'home_team': home_team, 'away_team': away_team, 'strength': torch.cat((home_brick,away_brick),0)})
                 validation_labels.append(wins_losses[game_num])
             else:
-                train_brick.append({'home_team': home_team, 'away_team': away_team, 'strength': torch.cat((home_brick,away_brick),0)})
-                train_labels.append(wins_losses[game_num])
+                switch = random.randint(0,1)
+                if switch == 0:
+                    train_brick.append({'home_team': home_team, 'away_team': away_team, 'strength': torch.cat((home_brick,away_brick),0)
+                                        , 'switch': 0})
+                    train_labels.append(wins_losses[game_num])
+                else:
+                    train_brick.append({'home_team': home_team, 'away_team': away_team,
+                                        'strength': torch.cat((away_brick, home_brick), 0), 'switch': 1})
+                    train_labels.append(1 - wins_losses[game_num])
+
             game_num += 1
         print(game_num)
-        for dict in train_brick: # to help look at actually good teams
+        for dict in train_brick: # to help look teams with enough data points
             counter = 0
             team_split = 0
             for player in dict['strength']:
-                if player[0][0] != 0 or player[0][1] != 0 or player[1][0] != 0 or player[1][1] != 0:
+                if player != 0.7:
                     counter += 1
                 team_split += 1
                 if team_split == 120: # other team

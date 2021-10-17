@@ -32,21 +32,22 @@ def verify_rosters(current_year):
         if person['first_name'] == "Shea" and current_year == 2019:
             print('spmething')
         try:
-            please_work = detect_player(prelim_roster[person_team][position],player_name)
-            if please_work is not None: # if we find player in recruit list
+            player_rating = detect_player(prelim_roster[person_team][position],player_name)
+            if player_rating is not None: # if we find player in recruit list
                 if person_team in final_rosters:
                     if position in final_rosters[person_team]:
                         final_rosters[person_team][position].append(person)
                     else:
                         final_rosters[person_team][position] = [person]
                 else:
+                    print(final_rosters[person_team])
                     final_rosters[person_team] = {position: [person]}
 
                 final_rosters[person_team][position][-1]['rating'] = detect_player(prelim_roster[person_team][position],player_name)
-            else:
+            else: # First check other parts of the roster for this guy
                 pos,rating = sweep_roster(prelim_roster[person_team],player_name)
-                if pos is not None:
-                    pos = position #this will change where players are stored
+                if pos is not None: # Else he transferred...
+                    pos = position # this will change where players are stored
                     if person_team in final_rosters:
                         if pos in final_rosters[person_team]:
                             final_rosters[person_team][pos].append(person)
@@ -55,10 +56,10 @@ def verify_rosters(current_year):
                     else:
                         final_rosters[person_team] = {pos: [person]}
                     final_rosters[person_team][pos][-1]['rating'] = rating
-                else:
+                """else: # Transfer cleanup is right now too much work
                     print(player_name)
                     if player_name == 'Shea Patterson':
-                        print('found')
+                        print('found example')
                     player_name = player_name.replace(' ','%20')
                     player_name = player_name.replace("'", '%27')
                     url = "https://api.collegefootballdata.com/player/search?searchTerm={}".format(player_name)
@@ -85,7 +86,7 @@ def verify_rosters(current_year):
                         pass
                     else:
                         print('GOT ONE')
-                    print(player)
+                    print(player)"""
 
         except KeyError:
             pos,rating = sweep_roster(prelim_roster[person_team],player_name)
@@ -101,7 +102,6 @@ def verify_rosters(current_year):
                 final_rosters[person_team][pos][-1]['rating'] = rating
 
     print(current_year)
-    print(final_rosters['Ohio State']['QB'])
     #print(final_rosters['Michigan']['APB'])
     #for player in prelim_roster['Michigan']['RB']:
     #print(player['name'])
@@ -114,7 +114,7 @@ def verify_rosters(current_year):
             print(key)"""
 
     
-def detect_player(list_dict,player_name):
+def detect_player(list_dict,player_name): # returns the rating of that player with that name
     for player in list_dict:
         if player['name'] == player_name:
             return player['rating']
