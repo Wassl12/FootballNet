@@ -26,12 +26,12 @@ Jumbles home and away teams so that the model doesn't take shortcuts. Ensure tha
 ## predict.py
 Runs the pytorch training algorithm. Doesn't use a data loader because the dataset is small. Adjust batch size to fit your needs and make changes to dataloading depending on tensor size.
 
-# Notes
+## Notes
 * Valid.txt defines teams you want to be analyzed. Right now, it's set to a semi-arbitrary list of good teams. You can make the list bigger if you'd like.
 * Model.py contains the model you use. This will have to be adjusted according to team.py
 * A hand-picked validation json lies in the data/directory. This defines how you want to split up the training vs validation. Be safer though and put teams you care more about in the validation dict and let it train on other stuff.
 
-# TODO
+## TODO
 1. Add a script to fetch betting information
 2. Add a script to clean betting information and sync it with game outcomes (same length as trainY, valY, etc)
 3. Test accuracy of model on spread (probably really low)
