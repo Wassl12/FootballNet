@@ -1,8 +1,13 @@
 import requests
 import json
-import os.path
+import os
 from os import path
-cfbd_key = 'VMVOIIRs/yD2q9bmV10VxH8t5ncCPbSwhnelhV+7yos5WNu8OnK5EjC2lFqCwRbc'
+from dotenv import  load_dotenv
+
+
+load_dotenv(".env")
+cfbd_key = os.environ.get("KEY")
+#cfbd_key = 'VMVOIIRs/yD2q9bmV10VxH8t5ncCPbSwhnelhV+7yos5WNu8OnK5EjC2lFqCwRbc'
 def team_fetch():
     if not path.exists('team_list.json'):
         team_list = (requests.get('https://api.collegefootballdata.com/teams')).json()
